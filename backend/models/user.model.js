@@ -18,7 +18,7 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
-
+//for sign up
 userSchema.statics.signup = async function (email, password) {
   // validation
 
@@ -30,9 +30,9 @@ userSchema.statics.signup = async function (email, password) {
     throw Error("Email must be a valid email")
   }
 
-  if(!validator.isStrongPassword(password)){
-    throw Error("Password must be a valid password")
-  }
+  // if(!validator.isStrongPassword(password)){
+  //   throw Error("Password must be a valid password")
+  // }
 
 
 
@@ -51,6 +51,29 @@ userSchema.statics.signup = async function (email, password) {
 
 };
 
+// for sign in
+
+userSchema.statics.login = async function (email, password) {
+  // validation
+
+  if(!email || !password) {
+    throw Error("All Fields Must Be Filled")
+  }
+
+  if(!validator.isEmail(email)){
+    throw Error("Email must be a valid email")
+  }
+
+  const user = await this.findOne({ email });
+  if (!user) {
+    throw Error("Email Is Not Found");
+  }
+  const match = await bcrypt.compare(password,user.password)
+  if(!match) {
+    throw Error("Incorrect Password")
+  }
+  return user;
+};
 
 const User = mongoose.model("User", userSchema);
 
